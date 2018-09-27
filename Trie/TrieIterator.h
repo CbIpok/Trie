@@ -4,7 +4,10 @@
 template <class T> class TrieIterator : public std::iterator<std::forward_iterator_tag, std::pair<std::string, T&>>
 {
 public:
-	TrieIterator(value_type & x);
+	TrieIterator(const Trie& x)
+	{
+
+	}
 	TrieIterator(const TrieIterator& mit);
 
 	TrieIterator& operator++();
@@ -16,5 +19,6 @@ public:
 	value_type operator*();
 	value_type * operator->();
 private:
-	
+	const Trie& _trie;
+
 };

@@ -16,15 +16,17 @@ public:
 
 	struct Node
 	{
-		Node()
+		Node(const Node* parrent = nullptr)
 		{
-			for (auto& i : Nodes)
+			for (auto& i : childs)
 			{
 				i = nullptr;
 			}
+			this->parrent = parrent;
 		}
 		value_type value;
-		std::unique_ptr<Node> Nodes[256];
+		std::unique_ptr<Node> childs[256];
+		const Node* parrent;
 	};
 
 	Trie()
@@ -106,6 +108,11 @@ public:
 private:
 	size_t _size = 0;
 	Node _trie;
+
+	/*Node _createNode(const Node& parrent)
+	{
+		
+	}*/
 	std::pair<Node&,bool> _getNode(const key_type& k)
 	{
 		Node* curNode = &_trie;
@@ -113,14 +120,14 @@ private:
 		for (size_t i = 0; i < k.size(); i++)
 		{
 			unsigned char index = (k.at(i));
-			if (_trie.Nodes[index].get() != nullptr)
+			if (_trie.childs[index].get() != nullptr)
 			{
-				curNode = _trie.Nodes[index].get();
+				curNode = _trie.childs[index].get();
 			}
 			else
 			{
-				_trie.Nodes[index].reset(new Node());
-				curNode = _trie.Nodes[index].get();
+				_trie.childs[index].reset(new Node());
+				curNode = _trie.childs[index].get();
 				isCreated = true;
 			}
 		}
@@ -133,9 +140,9 @@ private:
 		for (size_t i = 0; i < k.size(); i++)
 		{
 			unsigned char index = (k.at(i));
-			if (_trie.Nodes[index].get() != nullptr)
+			if (_trie.childs[index].get() != nullptr)
 			{
-				curNode = _trie.Nodes[index].get();
+				curNode = _trie.childs[index].get();
 			}
 			else
 			{
