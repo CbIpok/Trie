@@ -1,48 +1,148 @@
 #pragma once
+#include <map>
+#include<memory>
+#include <string>
+#include <vector>
+
 template <class T> class Trie
 {
 public:
 
-	typedef TrieIterator<T> iterator;
-	typedef ConstTrieIterator<T> const_iterator;
+//	typedef TrieIterator<T> iterator;
+//	typedef ConstTrieIterator<T> const_iterator;
 
 	typedef T value_type;
 	typedef std::string key_type;
 
-	Trie();
+	struct Node
+	{
+		Node()
+		{
+			for (auto& i : Nodes)
+			{
+				i = nullptr;
+			}
+		}
+		value_type value;
+		std::unique_ptr<Node> Nodes[256];
+	};
+
+	Trie()
+	{
+		_trie = Node();
+	}
+
+	
 	template <class InputIterator> Trie(InputIterator first, InputIterator last);
-	Trie(const Trie<T> & trie);
-	~Trie();
+	//Trie(const Trie<T> & trie);
+	~Trie() = default;
 
-	Trie<T> & operator= (const Trie & trie);
+	Trie<T> & operator= (const Trie & trie)
+	{
+		return Trie<T>(trie);
+	}
 
-	iterator begin();
-	const_iterator begin() const;
+	//iterator begin();
 
-	iterator end();
-	const_iterator end() const;
+	//const_iterator begin() const;
 
-	bool empty() const; //Test whether container is empty
-	size_t size() const;
+	//iterator end();
+	//const_iterator end() const;
 
-	value_type& operator[] (const key_type& k);
+	
+	inline bool empty() const//Test whether container is empty
+	{
+		return size() == 0;
+	}
 
-	std::pair<iterator, bool> insert(const key_type& k, const value_type& val);
+	inline size_t size() const
+	{
+		return _size;
+	}
+
+	const value_type& operator[] (const key_type& k) const
+	{
+		return _getNode(k).first.value;
+	}
+
+	value_type& operator[] (const key_type& k)
+	{
+		return _getNode(k).first.value;
+	}
+	
+//	std::pair<iterator, bool> insert(const key_type& k, const value_type& val);
 
 	template <class InputIterator> void insert(InputIterator first, InputIterator last);
 
 	//удаление
-	void erase(iterator position);
-	size_t erase(const key_type& k);
-	void erase(iterator first, iterator last);
+	//void erase(iterator position);
 
-	void swap(Trie& trie);
+	size_t erase(const key_type& k)
+	{
+		if (!_findNode(k))
+		{
+			return 0;
+		}
+		else
+		{
+			_getNode(k).first.value = nullptr; 
+			return 1;
+		}
+	}
 
-	void clear(); //очистить структуру
+	//void erase(iterator first, iterator last);
+
+	//void swap(Trie& trie);
+
+	//void clear(); //очистить структуру
 
 	//найти элемент
-	iterator find(const key_type& k);
-	const_iterator find(const key_type& k) const;
+	//iterator find(const key_type& k);
+	//const_iterator find(const key_type& k) const;
 
-	SubTrie<T> GetSubTrie(const key_type & subKey); // получить subtree
+	//SubTrie<T> GetSubTrie(const key_type & subKey); // получить subtree
+
+	inline Node getMainNode() { return _trie; };
+private:
+	size_t _size = 0;
+	Node _trie;
+	std::pair<Node&,bool> _getNode(const key_type& k)
+	{
+		Node* curNode = &_trie;
+		bool isCreated = false;
+		for (size_t i = 0; i < k.size(); i++)
+		{
+			unsigned char index = (k.at(i));
+			if (_trie.Nodes[index].get() != nullptr)
+			{
+				curNode = _trie.Nodes[index].get();
+			}
+			else
+			{
+				_trie.Nodes[index].reset(new Node());
+				curNode = _trie.Nodes[index].get();
+				isCreated = true;
+			}
+		}
+		return std::pair<Node&, bool>(*curNode,isCreated);
+	}
+
+	bool _findNode(const key_type& k)
+	{
+		Node* curNode = &_trie;
+		for (size_t i = 0; i < k.size(); i++)
+		{
+			unsigned char index = (k.at(i));
+			if (_trie.Nodes[index].get() != nullptr)
+			{
+				curNode = _trie.Nodes[index].get();
+			}
+			else
+			{
+				return false;
+			}
+		}
+		return curNode.value != nullptr;
+	}
+	
 };

@@ -1,4 +1,6 @@
 #pragma once
+#include "Trie.h"
+#include <queue>
 template <class T> class TrieIterator : public std::iterator<std::forward_iterator_tag, std::pair<std::string, T&>>
 {
 public:
@@ -13,4 +15,6 @@ public:
 
 	value_type operator*();
 	value_type * operator->();
+private:
+	
 };
