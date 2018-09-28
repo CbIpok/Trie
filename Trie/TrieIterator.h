@@ -15,14 +15,20 @@ public:
 
 	TrieIterator& operator++()
 	{
-		_getNextNode();
+		do 
+		{
+			_getNextNode();
+		} while (_curNode->value.get() == nullptr);
+		
 		return *this;
 	}
 
-	/*TrieIterator operator++(int)
+	TrieIterator operator++(int)
 	{
-
-	}*/
+		TrieIterator trieIterator(this);
+		++this;
+		return trieIterator;
+	}
 
 	bool operator==(const TrieIterator& rhs);
 	bool operator!=(const TrieIterator& rhs);
@@ -36,11 +42,11 @@ private:
 	std::stack<char> _trieTrace;
 	node* _curNode;
 
-	bool _getFirstIndex (unsigned char& index,unsigned char startPos = 0)
+	bool _getFirstIndex(unsigned char& index, unsigned char startPos = 0)
 	{
 		for (unsigned char i = startPos + 1; i < UCHAR_MAX; i++)
 		{
-			if (_curNode->childs[i].get()!=nullptr)
+			if (_curNode->childs[i].get() != nullptr)
 			{
 				index = i;
 				return true;
@@ -48,8 +54,14 @@ private:
 		}
 		return false;
 	}
+
+	
 	node* _getNextNode(bool isFallingDown = true)
 	{
+		if (_curNode == nullptr)
+		{
+			throw(std::out_of_range("can not iterate eof"));
+		}
 		unsigned char index;
 		if (isFallingDown)
 		{
@@ -66,23 +78,22 @@ private:
 		}
 		else
 		{
+			
 			_curNode = _curNode->parrent;
-			try
+			while (!_getFirstIndex(index, _trieTrace.top()))
 			{
-				while (!_getFirstIndex(index, _trieTrace.top()))
+				_trieTrace.pop();
+				_curNode = _curNode->parrent;
+				if (_curNode == nullptr)
 				{
-					_trieTrace.pop();
-					_curNode = _curNode->parrent;
+					throw(std::out_of_range("can not iterate eof"));
 				}
 			}
-			catch (const std::exception&)
-			{
-				throw(std::out_of_range("can't iterate eof"));
-			}
+
 			_trieTrace.pop();
 			_curNode = _curNode->childs[index].get();
 			_trieTrace.push(index);
-		
+
 			return _curNode;
 		}
 
