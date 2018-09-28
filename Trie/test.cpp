@@ -9,11 +9,14 @@ int main()
 	
 	Trie<int> trie;
 	trie[""] = -1;
-	for (size_t i = 0; i < 100; i++)
+	for (size_t i = 1; i < 50; i++)
 	{
 		trie[to_string(i)] = i;
 	}
 	TrieIterator<int> ti(trie.getMainNode());
-	cout << *ti;
+	for (size_t i = 0; i < 100; i++)
+	{
+		cout << *(++ti)<<endl;
+	}
 	return 0;
 }

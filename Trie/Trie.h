@@ -16,7 +16,7 @@ public:
 
 	struct Node
 	{
-		Node(const Node* parrent = nullptr)
+		Node( Node* parrent = nullptr)
 		{
 			for (auto& i : childs)
 			{
@@ -27,7 +27,7 @@ public:
 		}
 		std::unique_ptr<value_type> value;
 		std::unique_ptr<Node> childs[256];
-		const Node* parrent;
+		Node* parrent;
 	};
 
 	Trie()
@@ -127,14 +127,14 @@ private:
 		for (size_t i = 0; i < k.size(); i++)
 		{
 			unsigned char index = (k.at(i));
-			if (_trie.childs[index].get() != nullptr)
+			if (curNode->childs[index].get() != nullptr)
 			{
-				curNode = _trie.childs[index].get();
+				curNode = curNode->childs[index].get();
 			}
 			else
 			{
-				_trie.childs[index].reset(new Node());
-				curNode = _trie.childs[index].get();
+				curNode->childs[index].reset(new Node(curNode));
+				curNode = curNode->childs[index].get();
 				isCreated = true;
 			}
 		}
