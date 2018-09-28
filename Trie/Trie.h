@@ -23,8 +23,9 @@ public:
 				i = nullptr;
 			}
 			this->parrent = parrent;
+			value.reset(new value_type);
 		}
-		value_type value;
+		std::unique_ptr<value_type> value;
 		std::unique_ptr<Node> childs[256];
 		const Node* parrent;
 	};
@@ -62,19 +63,27 @@ public:
 		return _size;
 	}
 
-	const value_type& operator[] (const key_type& k) const
+	/*const value_type& operator[] (const key_type& k) const
 	{
 		return _getNode(k).first.value;
-	}
+	}*/
 
 	value_type& operator[] (const key_type& k)
 	{
-		return _getNode(k).first.value;
+		Node& node = _getNode(k).first;
+		if (node.value.get() == nullptr)
+		{
+			node.value.reset(new value_type);
+		}
+		return *node.value.get();
 	}
 	
-//	std::pair<iterator, bool> insert(const key_type& k, const value_type& val);
+	/*std::pair<iterator, bool> insert(const key_type& k, const value_type& val);
+	{
+		auto node = _getNode(k);
+	}*/
 
-	template <class InputIterator> void insert(InputIterator first, InputIterator last);
+	//template <class InputIterator> void insert(InputIterator first, InputIterator last);
 
 	//удаление
 	//void erase(iterator position);
@@ -87,7 +96,8 @@ public:
 		}
 		else
 		{
-			_getNode(k).first.value = nullptr; 
+			delete(_getNode(k).first.value.release());
+			_getNode(k).first.value.reset(nullptr); 
 			return 1;
 		}
 	}
@@ -104,15 +114,12 @@ public:
 
 	//SubTrie<T> GetSubTrie(const key_type & subKey); // получить subtree
 
-	inline Node getMainNode() { return _trie; };
+	inline Node* getMainNode() { return &_trie; };
 private:
 	size_t _size = 0;
 	Node _trie;
 
-	/*Node _createNode(const Node& parrent)
-	{
-		
-	}*/
+
 	std::pair<Node&,bool> _getNode(const key_type& k)
 	{
 		Node* curNode = &_trie;
@@ -149,7 +156,7 @@ private:
 				return false;
 			}
 		}
-		return curNode.value != nullptr;
+		return curNode->value.get() != nullptr;
 	}
 	
 };
