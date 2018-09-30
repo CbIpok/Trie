@@ -1,6 +1,7 @@
 #pragma once
 #include "Trie.h"
-#include <stack>
+#include "StringStack.h"
+//#include <stack>
 template <class T> class TrieIterator : public std::iterator<std::forward_iterator_tag, std::pair<std::string, T&>>
 {
 public:
@@ -11,7 +12,11 @@ public:
 	{
 		_curNode = x;
 	}
-	TrieIterator(const TrieIterator& mit);
+	TrieIterator()
+	{
+		_curNode == nullptr;
+	}
+	//TrieIterator(const TrieIterator& mit);
 
 	TrieIterator& operator++()
 	{
@@ -23,23 +28,30 @@ public:
 		return *this;
 	}
 
-	TrieIterator operator++(int)
+	TrieIterator operator++(int)//notWorking
 	{
-		TrieIterator trieIterator(this);
-		++this;
+		TrieIterator trieIterator(*this);
+		++(*this);
 		return trieIterator;
 	}
 
-	bool operator==(const TrieIterator& rhs);
-	bool operator!=(const TrieIterator& rhs);
+	inline bool operator==(const TrieIterator& rhs)
+	{
+		return _curNode == rhs.getNode();
+	}
+	inline bool operator!=(const TrieIterator& rhs)
+	{
+		return _curNode == rhs.getNode();
+	}
 
 	value_type operator*()
 	{
 		return  *_curNode->value.get();
 	}
 	value_type * operator->();
+	inline const node* getNode() const { return _curNode; };
 private:
-	std::stack<char> _trieTrace;
+	StringStack _trieTrace;
 	node* _curNode;
 
 	bool _getFirstIndex(unsigned char& index, unsigned char startPos = 0)

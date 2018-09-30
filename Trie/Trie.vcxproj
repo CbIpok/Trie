@@ -140,6 +140,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="ConstTrieIterator.h" />
+    <ClInclude Include="StringStack.h" />
     <ClInclude Include="SubTrie.h" />
     <ClInclude Include="Trie.h" />
     <ClInclude Include="TrieIterator.h" />

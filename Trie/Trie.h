@@ -23,7 +23,7 @@ public:
 				i = nullptr;
 			}
 			this->parrent = parrent;
-			value.reset(new value_type);
+			value.reset(nullptr);
 		}
 		std::unique_ptr<value_type> value;
 		std::unique_ptr<Node> childs[256];
@@ -45,7 +45,10 @@ public:
 		return Trie<T>(trie);
 	}
 
-	//iterator begin();
+	/*iterator begin()
+	{
+
+	}*/
 
 	//const_iterator begin() const;
 
@@ -138,6 +141,7 @@ private:
 				isCreated = true;
 			}
 		}
+
 		return std::pair<Node&, bool>(*curNode,isCreated);
 	}
 
@@ -147,9 +151,9 @@ private:
 		for (size_t i = 0; i < k.size(); i++)
 		{
 			unsigned char index = (k.at(i));
-			if (_trie.childs[index].get() != nullptr)
+			if (curNode->childs[index].get() != nullptr)
 			{
-				curNode = _trie.childs[index].get();
+				curNode = curNode->childs[index].get();
 			}
 			else
 			{

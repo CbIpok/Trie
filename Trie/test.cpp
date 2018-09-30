@@ -18,7 +18,7 @@ int main()
 		trie.erase(to_string(i));
 	}
 	TrieIterator<int> ti(trie.getMainNode());
-	for (size_t i = 0; i < 25; i++)
+	for (size_t i = 0; i < 20; i++)
 	{
 		try
 		{
