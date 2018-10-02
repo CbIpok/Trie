@@ -3,12 +3,13 @@
 #include<memory>
 #include <string>
 #include <vector>
+#include "TrieIterator.h"
 
 template <class T> class Trie
 {
 public:
 
-//	typedef TrieIterator<T> iterator;
+	typedef TrieIterator<T> iterator;
 //	typedef ConstTrieIterator<T> const_iterator;
 
 	typedef T value_type;
@@ -32,7 +33,7 @@ public:
 
 	Trie()
 	{
-		_trie = Node();
+		_trie.reset( new Node());
 	}
 
 	
@@ -45,14 +46,17 @@ public:
 		return Trie<T>(trie);
 	}
 
-	/*iterator begin()
+	iterator begin()
 	{
-
-	}*/
+		return iterator(_trie.get());
+	}
 
 	//const_iterator begin() const;
 
-	//iterator end();
+	iterator end()
+	{
+		return iterator();
+	}
 	//const_iterator end() const;
 
 	
@@ -66,10 +70,10 @@ public:
 		return _size;
 	}
 
-	/*const value_type& operator[] (const key_type& k) const
+	const value_type& operator[] (const key_type& k) const
 	{
 		return _getNode(k).first.value;
-	}*/
+	}
 
 	value_type& operator[] (const key_type& k)
 	{
@@ -81,15 +85,20 @@ public:
 		return *node.value.get();
 	}
 	
-	/*std::pair<iterator, bool> insert(const key_type& k, const value_type& val);
+	std::pair<iterator, bool> insert(const key_type& k, const value_type& val)//NOT TESTED
 	{
 		auto node = _getNode(k);
-	}*/
+		node.first.value = val;
+		return std::pair<iterator, bool>(node.first,node.second);
+	}
 
 	//template <class InputIterator> void insert(InputIterator first, InputIterator last);
 
 	//удаление
-	//void erase(iterator position);
+	void erase(iterator position)
+	{
+		erase((*position).first);
+	}
 
 	size_t erase(const key_type& k)
 	{
@@ -101,31 +110,48 @@ public:
 		{
 			delete(_getNode(k).first.value.release());
 			_getNode(k).first.value.reset(nullptr); 
+			_size--;
 			return 1;
 		}
 	}
 
-	//void erase(iterator first, iterator last);
+	void erase(iterator first, iterator last)
+	{
+		for (; (first != last) && (first!= end()); first++)
+		{
+			erase((*first).first);
+		}
+	}
 
 	//void swap(Trie& trie);
 
-	//void clear(); //очистить структуру
+	void clear()
+	{
+		
+	}
 
 	//найти элемент
-	//iterator find(const key_type& k);
+	iterator find(const key_type& k) //НЕ РАБОТАЕТ
+	{
+		if (!_findNode(k))
+		{
+			throw std::out_of_range("");
+		}
+		return iterator(&_getNode(k).first);
+	}
 	//const_iterator find(const key_type& k) const;
 
 	//SubTrie<T> GetSubTrie(const key_type & subKey); // получить subtree
 
-	inline Node* getMainNode() { return &_trie; };
+	inline Node* getMainNode() { return _trie.get(); };
 private:
 	size_t _size = 0;
-	Node _trie;
+	std::unique_ptr<Node> _trie;
 
-
+protected:
 	std::pair<Node&,bool> _getNode(const key_type& k)
 	{
-		Node* curNode = &_trie;
+		Node* curNode = _trie.get();
 		bool isCreated = false;
 		for (size_t i = 0; i < k.size(); i++)
 		{
@@ -147,7 +173,7 @@ private:
 
 	bool _findNode(const key_type& k)
 	{
-		Node* curNode = &_trie;
+		Node* curNode = _trie.get();
 		for (size_t i = 0; i < k.size(); i++)
 		{
 			unsigned char index = (k.at(i));

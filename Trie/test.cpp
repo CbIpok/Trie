@@ -9,26 +9,20 @@ int main()
 	
 	Trie<int> trie;
 	trie[""] = -1;
-	for (size_t i = 0; i < 20; i++)
+	for (size_t i = 0; i < 10; i++)
 	{
 		trie[to_string(i)] = i;
 	}
-	for (size_t i = 15; i < 20; i++)
+	
+	auto ti = trie.find("5");
+	
+	while (ti!=trie.end())
 	{
-		trie.erase(to_string(i));
+		cout << (*ti++).first << " " << (*ti).second << endl;
 	}
-	TrieIterator<int> ti(trie.getMainNode());
-	for (size_t i = 0; i < 20; i++)
+	/*for (const auto &i : trie)
 	{
-		try
-		{
-			cout << *(++ti) << endl;
-		}
-		catch (const std::out_of_range&)
-		{
-			cout << "eof" << endl;
-		}
-		
-	}
+		cout << i.first << " " << *i.second << endl;
+	}*/
 	return 0;
 }

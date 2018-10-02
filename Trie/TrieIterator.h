@@ -1,8 +1,12 @@
 #pragma once
 #include "Trie.h"
 #include "StringStack.h"
+#include <map>
+#include <string>
 //#include <stack>
-template <class T> class TrieIterator : public std::iterator<std::forward_iterator_tag, std::pair<std::string, T&>>
+template <class T> class Trie;
+
+template <class T> class TrieIterator : public std::iterator<std::forward_iterator_tag, std::pair<std::string, T&>> 
 {
 public:
 	using value_type = T;
@@ -11,24 +15,39 @@ public:
 	TrieIterator(node* x)
 	{
 		_curNode = x;
+		if (_curNode->value == nullptr)
+		{
+			(*this)++;
+		}
 	}
 	TrieIterator()
 	{
-		_curNode == nullptr;
+		_curNode = nullptr;
 	}
+
+	virtual ~TrieIterator() = default;
 	//TrieIterator(const TrieIterator& mit);
+
 
 	TrieIterator& operator++()
 	{
-		do 
+		try
 		{
-			_getNextNode();
-		} while (_curNode->value.get() == nullptr);
+			do
+			{
+				_getNextNode();
+			} while (_curNode->value.get() == nullptr);
+		}
+		catch (const std::out_of_range)
+		{
+
+		}
+		
 		
 		return *this;
 	}
 
-	TrieIterator operator++(int)//notWorking
+	TrieIterator operator++(int)
 	{
 		TrieIterator trieIterator(*this);
 		++(*this);
@@ -41,18 +60,22 @@ public:
 	}
 	inline bool operator!=(const TrieIterator& rhs)
 	{
-		return _curNode == rhs.getNode();
+		return !(_curNode == rhs.getNode());
 	}
 
-	value_type operator*()
+	std::pair<std::string, T*> operator*()
 	{
-		return  *_curNode->value.get();
+		return  std::pair<std::string, T*>(_trieTrace.getString(), (_curNode == nullptr) ? nullptr : _curNode->value.get());
 	}
-	value_type * operator->();
+
+	value_type * operator->()
+	{
+		_curNode->value;
+	}
+	
 	inline const node* getNode() const { return _curNode; };
-private:
-	StringStack _trieTrace;
-	node* _curNode;
+protected:
+	
 
 	bool _getFirstIndex(unsigned char& index, unsigned char startPos = 0)
 	{
@@ -110,4 +133,8 @@ private:
 		}
 
 	}
+
+	private:
+		StringStack _trieTrace;
+		node* _curNode;
 };

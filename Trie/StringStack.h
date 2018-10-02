@@ -2,7 +2,7 @@
 #include <stack>
 #include <string>
 
-class StringStack
+class StringStack final
 {
 public:
 	
