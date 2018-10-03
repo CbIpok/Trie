@@ -9,16 +9,16 @@ int main()
 	
 	Trie<int> trie;
 	trie[""] = -1;
-	for (size_t i = 0; i < 10; i++)
+	for (size_t i = 0; i < 1000; i++)
 	{
 		trie[to_string(i)] = i;
 	}
 	
-	auto ti = trie.find("5");
+	auto ti = trie.find("1");
 	
 	while (ti!=trie.end())
 	{
-		cout << (*ti++).first << " " << (*ti).second << endl;
+		cout << (*ti++).first << " " << *(*ti).second << endl;
 	}
 	/*for (const auto &i : trie)
 	{

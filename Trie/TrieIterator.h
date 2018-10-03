@@ -10,19 +10,22 @@ template <class T> class TrieIterator : public std::iterator<std::forward_iterat
 {
 public:
 	using value_type = T;
-	using value_type_trie = Trie<value_type>;
+	using value_type_trie = Trie<T>;
 	using node = typename value_type_trie::Node;
-	TrieIterator(node* x)
+	TrieIterator(node* start, const std::string& startPos = "",node* end = nullptr) :
+		_end(end),
+		_trieTrace(startPos),
+		_curNode(start)
 	{
-		_curNode = x;
 		if (_curNode->value == nullptr)
 		{
 			(*this)++;
 		}
 	}
-	TrieIterator()
+	TrieIterator():
+		_curNode (nullptr)
 	{
-		_curNode = nullptr;
+		
 	}
 
 	virtual ~TrieIterator() = default;
@@ -38,8 +41,10 @@ public:
 				_getNextNode();
 			} while (_curNode->value.get() == nullptr);
 		}
-		catch (const std::out_of_range)
+		catch (const std::out_of_range&)
 		{
+			_curNode = nullptr;
+			_end == nullptr;
 
 		}
 		
@@ -93,7 +98,7 @@ protected:
 	
 	node* _getNextNode(bool isFallingDown = true)
 	{
-		if (_curNode == nullptr)
+		if (_curNode == _end)
 		{
 			throw(std::out_of_range("can not iterate eof"));
 		}
@@ -119,7 +124,7 @@ protected:
 			{
 				_trieTrace.pop();
 				_curNode = _curNode->parrent;
-				if (_curNode == nullptr)
+				if (_curNode == _end)
 				{
 					throw(std::out_of_range("can not iterate eof"));
 				}
@@ -137,4 +142,5 @@ protected:
 	private:
 		StringStack _trieTrace;
 		node* _curNode;
+		node* _end;
 };

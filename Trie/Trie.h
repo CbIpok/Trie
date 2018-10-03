@@ -113,6 +113,7 @@ public:
 			_size--;
 			return 1;
 		}
+
 	}
 
 	void erase(iterator first, iterator last)
@@ -131,24 +132,28 @@ public:
 	}
 
 	//найти элемент
-	iterator find(const key_type& k) //НЕ РАБОТАЕТ
+
+	iterator find(const key_type& k) 
 	{
 		if (!_findNode(k))
 		{
-			throw std::out_of_range("");
+			throw std::out_of_range("cant find " + k);
 		}
-		return iterator(&_getNode(k).first);
+		return iterator(&_getNode(k).first,k);
 	}
 	//const_iterator find(const key_type& k) const;
 
 	//SubTrie<T> GetSubTrie(const key_type & subKey); // получить subtree
 
 	inline Node* getMainNode() { return _trie.get(); };
-private:
-	size_t _size = 0;
-	std::unique_ptr<Node> _trie;
+
+	
 
 protected:
+	size_t _size = 0;
+
+	std::unique_ptr<Node> _trie;
+
 	std::pair<Node&,bool> _getNode(const key_type& k)
 	{
 		Node* curNode = _trie.get();
@@ -189,4 +194,5 @@ protected:
 		return curNode->value.get() != nullptr;
 	}
 	
+
 };

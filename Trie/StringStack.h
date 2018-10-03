@@ -6,7 +6,11 @@ class StringStack final
 {
 public:
 	
-	
+	StringStack(const std::string& startPos = "") :
+		_string(startPos)
+	{
+
+	}
 	inline char top() {
 		return _string.back();
 	}
