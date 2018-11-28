@@ -9,21 +9,45 @@
 typedef struct
 {
     int fd;
-    size_t lines_count;
-    size_t offset[100];
-    size_t size[100];
+    off_t lines_count;
+    off_t* offset;
+    off_t* size;
 } FileTable;
 
 const int BUFFER_SIZE = 6;
+
+size_t file_size(int fd)
+{
+    size_t cnt = 0;
+    char buf[BUFFER_SIZE];
+    int nbytes = read(fd, buf, BUFFER_SIZE);
+
+    while (nbytes > 0)
+    {
+        for (const char* ch = buf; ch < buf + BUFFER_SIZE; ch++)
+        {
+            if (*ch == '\n')
+            {
+                cnt++;
+            }
+        }
+
+        nbytes = read(fd, buf, BUFFER_SIZE);
+    }
+    lseek(fd, 0, SEEK_SET);
+    return cnt;
+}
 
 FileTable* read_file(const char* name)
 {
     FileTable* file = (FileTable*) malloc(sizeof(FileTable));
 
+
     if (!file)
     {
         return NULL;
     }
+
 
     file->fd = open(name, O_RDONLY);
 
@@ -33,10 +57,18 @@ FileTable* read_file(const char* name)
         return NULL;
     }
 
+    size_t tfile_size = file_size(file->fd);
+    file ->offset = (off_t*)malloc(tfile_size*sizeof(off_t));
+    file ->size = (off_t*)malloc(tfile_size*sizeof(off_t));
+
+    if (file->offset == NULL || file->size == NULL)
+    {
+        return NULL;
+    }
     file->lines_count = 1;
     file->offset[0] = 0;
     char buf[BUFFER_SIZE];
-    size_t i = 0, line_offset = 0;
+    off_t i = 0, line_offset = 0;
     int nbytes = read(file->fd, buf, BUFFER_SIZE);
 
     while (nbytes > 0)
@@ -118,12 +150,12 @@ int main(int argc, char** argv)
         }
         else if (string_number > 0)
         {
-            size_t len = file->size[string_number-1];
+            off_t len = file->size[string_number-1];
 
-            for (size_t i = 0; i < len; i += BUFFER_SIZE)
+            for (off_t i = 0; i < len; i += BUFFER_SIZE)
             {
                 char buf[BUFFER_SIZE];
-                size_t chunk = (len - i > BUFFER_SIZE)? BUFFER_SIZE : len - i;
+                off_t chunk = (len - i > BUFFER_SIZE)? BUFFER_SIZE : len - i;
 
                 if (lseek(file->fd, file->offset[string_number-1] + i, SEEK_SET) == -1 || read(file->fd, buf, chunk) != chunk)
                 {
