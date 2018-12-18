@@ -13,15 +13,15 @@ int main(int argc, char** argv)
     }
 
     pid_t pid = fork();
-    
+
     if (pid == -1)
     {
         perror("fork");
         exit(EXIT_SUCCESS);
     }
     else if (pid == 0)
-    {    
-        if (execv(argv[1], &argv[1]) == -1)
+    {
+        if (execvp(argv[1], &argv[1]) == -1)
         {
             perror("execv");
             exit(EXIT_FAILURE);
@@ -30,7 +30,7 @@ int main(int argc, char** argv)
     else
     {
         int status;
-        
+
         if (waitpid(pid, &status, 0) == -1)
         {
             perror("waitpid");
@@ -51,5 +51,5 @@ int main(int argc, char** argv)
         }
 
         exit(EXIT_SUCCESS);
-    }   
+    }
 }
