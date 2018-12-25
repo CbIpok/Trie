@@ -3,20 +3,19 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-int main()
+int main(int argc,char** argv)
 {
     printf("Parrent before\n");
     pid_t pid = fork();
-    
+
     if (pid == -1)
     {
         perror("Parrent after (error)");
         exit(EXIT_FAILURE);
     }
-    else if (pid == 0)
+
+    if (pid == 0)
     {
-        char* const argv[] = {"cat", "9.c", NULL};
-        
         if(execvp("cat", argv) == -1)
         {
             perror("Child in process (error)");
@@ -26,8 +25,8 @@ int main()
     else
     {
         printf("Parrent in process\n");
-        
-        if (waitpid(pid, NULL, 0) == -1)
+        int status;
+        if (waitpid(pid, &status,0) == -1)
         {
             perror("Parrent in process (error)");
             exit(EXIT_FAILURE);
